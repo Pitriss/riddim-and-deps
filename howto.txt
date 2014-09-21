@@ -1,0 +1,52 @@
+Copied from: http://www.thiessen.im/2010/10/riddim-a-neat-little-xmpp-bot-written-in-lua/
+
+The answer to IRC’s Eggdrop? Well, not quite, but much like Prosody in the beginning, it’s a solid ground to build on.
+It uses Verse, an XMPP client library for Lua. This post will show (mainly for later re-reading) how to setup Riddim.
+
+I assume Lua is present on the device you’re installing Riddim on (e.g. lua5.1 liblua5.1-socket2 liblua5.1-expat0 liblua5.1-sec1 for Debian/Ubuntu etc.).
+
+We need to checkout three projects, assuming they all go into ~/HAL/:
+
+~/HAL/$ hg clone http://code.matthewwild.co.uk/riddim/ riddim
+~/HAL/$ hg clone http://code.matthewwild.co.uk/squish/ squish
+~/HAL/$ hg clone http://code.matthewwild.co.uk/verse/ verse
+
+From within the Squish folder run:
+~/HAL/squish/$ make
+
+This will create an executeable “squish”. You may make it available system-wide by running:
+~/HAL/squish/$ sudo make install
+
+Back to our main folder (HAL), you can now squish Verse:
+~/HAL/$ ./squish/squish verse/ --use-http
+
+It will create a file called “verse.lua” in our main folder.
+
+Now all that’s left is creating a configuration file for Riddim itself. Name it “config.lua” and also put it into the main folder.
+A basic configuration may look like this:
+
+jid = "hal@thiessen.im/bot";
+password = "my-really-secure-password";
+nick = "HAL";
+--debug = true;
+command_prefix = "!";
+
+plugins = {
+
+"version",
+"ping",
+"tell",
+"slap",
+"groupchat",
+"commands",
+
+};
+
+autojoin = {
+
+"test@rooms.thiessen.im"
+
+};
+
+Riddim is started by typing:
+~/HAL/$ lua riddim/init.lua
