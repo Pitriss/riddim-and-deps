@@ -1,5 +1,3 @@
--- This plugin needs lua.iconv: http://luaforge.net/projects/lua-iconv/
-
 function riddim.plugins.urltitle(bot)
 	require "net.httpclient_listener";
 	local http = require "net.http";
@@ -11,8 +9,18 @@ function riddim.plugins.urltitle(bot)
 	local function handler(message)
 		local url = message.body and message.body:match("https?://%S+");
 		if url then
-			http.request(url, nil, function (data, code)
-				if code ~= 200 then return end
+			http.request(url, nil, function (data, code, headers)
+				if code ~= 200 then
+					if code == 302 or code == 301 then
+						reply = "This link redirects to "..headers.responseheaders.location
+						if message.room then
+							message.room:send_message(reply)
+						else
+							message:reply(reply);
+						end
+					end
+					return
+				end
 				local title = data:match("<title[^>]*>([^<]+)");
 				local encod = string.upper(data:match('charset=(%w+[-_]%w+)'))
 
