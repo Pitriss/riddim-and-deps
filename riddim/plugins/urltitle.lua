@@ -5,6 +5,7 @@ function riddim.plugins.urltitle(bot)
 
 	local nstr = nil
 	local err = nil
+	local title = nil
 
 	local function handler(message)
 		local url = message.body and message.body:match("https?://%S+");
@@ -23,22 +24,17 @@ function riddim.plugins.urltitle(bot)
 				end
 				local title = data:match("<title[^>]*>([^<]+)");
 				local encod = string.upper(data:match('charset=(%w+[-_]%w+)'))
-
 				if title then
 					title = title:gsub("\n", "");
 					if encod ~= "UTF-8" then
 						local constr = iconv.new("UTF-8", encod.."//TRANSLIT")
 						nstr, err = constr:iconv(title)
-					end
-					if err == nil and nstr ~= nil then
 						title = nstr
 					end
-					if nstr ~= nil or encod == "UTF-8" then
-						if message.room then
-							message.room:send_message(title)
-						else
-							message:reply(title);
-						end
+					if message.room then
+						message.room:send_message(title)
+					else
+						message:reply(title);
 					end
 				end
 			end);
