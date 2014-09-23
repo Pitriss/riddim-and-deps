@@ -24,6 +24,8 @@ function riddim.plugins.weather(bot)
 
 		bot:hook("commands/weather", function (command)
 			local city = trim(command.param);
+			city = city:gsub("%s", "+")
+
 			if city then
 				url = "http://api.wunderground.com/api/"..tostring(apikey).."/conditions/q/"..tostring(city)..".json"
 				http.request(url, nil, function (data, code)
