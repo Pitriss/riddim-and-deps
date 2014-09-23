@@ -40,7 +40,7 @@ function riddim.plugins.weather(bot)
 
 					if obj.response.error ~= nil then
 -- 						table.foreach(obj.response.error, print)
-						command:reply(tostring(obj.response.error.type).."error: "..tostring(obj.response.error.description)..".")
+						command:reply(tostring(obj.response.error.type).." error: "..tostring(obj.response.error.description)..".")
 					else
 -- 						table.foreach(obj.current_observation, print)
 						response = "Weather for "..obj.current_observation.display_location.full.." (Measured at: "
