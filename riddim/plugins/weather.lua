@@ -21,13 +21,22 @@ function riddim.plugins.weather(bot)
 			return (s:gsub("^%s*(.-)%s*$", "%1"))
 		end
 
+		function url_encode(str)
+			if (str) then
+				str = string.gsub (str, "\n", "\r\n")
+				str = string.gsub (str, "([^%w %-%_%.%~])",
+					function (c) return string.format ("%%%02X", string.byte(c)) end)
+				str = string.gsub (str, " ", "+")
+			end
+			return str
+		end
 
 		bot:hook("commands/weather", function (command)
 			local city = trim(command.param);
-			city = city:gsub("%s", "+")
 
 			if city then
-				url = "http://api.wunderground.com/api/"..tostring(apikey).."/conditions/q/"..tostring(city)..".json"
+				ecity = url_encode(city)
+				url = "http://api.wunderground.com/api/"..tostring(apikey).."/conditions/q/"..tostring(ecity)..".json"
 				http.request(url, nil, function (data, code)
 					if code ~= 200 then
 						command:reply("Error while contacting server!")
@@ -38,13 +47,9 @@ function riddim.plugins.weather(bot)
 						command:reply("Error while parsing data!")
 					end
 
---					parsing data 5a1b6f06a87d5502
-
 					if obj.response.error ~= nil then
--- 						table.foreach(obj.response.error, print)
 						command:reply(tostring(obj.response.error.type).." error: "..tostring(obj.response.error.description)..".")
 					else
--- 						table.foreach(obj.current_observation, print)
 						response = "Weather for "..obj.current_observation.display_location.full.." (Measured at: "
 						..obj.current_observation.observation_location.full.."): Temperature: "
  						..tostring(obj.current_observation.temp_c).."°C (feels like "
@@ -55,10 +60,45 @@ function riddim.plugins.weather(bot)
  						..tostring(obj.current_observation.visibility_km).." km. Last updated: "
  						..os.date("%d.%m.%Y %X", obj.current_observation.observation_epoch).."."
 						command:reply(response)
+					end
+				end);
+			else
+				command:reply("Please specify city as parameter")
+			end
+		end);
 
+-- Astro command
+
+		bot:hook("commands/astro", function (command)
+			local city = trim(command.param);
+
+			if city then
+				ecity = url_encode(city)
+				url = "http://api.wunderground.com/api/"..tostring(apikey).."/astronomy/q/"..tostring(city)..".json"
+				http.request(url, nil, function (data, code)
+					if code ~= 200 then
+						command:reply("Error while contacting server!")
+						return
+					end
+					local obj, pos, err = json.decode (data, 1, nil)
+					if err then
+						command:reply("Error while parsing data!")
 					end
 
-
+					if obj.response.error ~= nil then
+						command:reply(tostring(obj.response.error.type).." error: "..tostring(obj.response.error.description)..".")
+					else
+						response = "Astronomy info for "..city
+						.." (Local time "..tostring(obj.moon_phase.current_time.hour)
+						..":"..tostring(obj.moon_phase.current_time.minute).."): Sunrise at "
+						..tostring(obj.sun_phase.sunrise.hour)..":"
+ 						..tostring(obj.sun_phase.sunrise.minute)..". Sunset at "
+ 						..tostring(obj.sun_phase.sunset.hour)..":"
+ 						..tostring(obj.sun_phase.sunset.minute)..". Moon phase: "
+ 						..obj.moon_phase.phaseofMoon..", moon visibility is "
+ 						..tostring(obj.moon_phase.percentIlluminated).."%."
+						command:reply(response)
+					end
 				end);
 			else
 				command:reply("Please specify city as parameter")
