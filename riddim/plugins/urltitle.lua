@@ -23,6 +23,9 @@ function riddim.plugins.urltitle(bot)
 					return
 				end
 				local title = data:match("<title[^>]*>([^<]+)");
+				if data:match('charset=(%w+[-_]%w+)') == nil then
+					return
+				end
 				local encod = string.upper(data:match('charset=(%w+[-_]%w+)'))
 				if title then
 					title = title:gsub("\n", "");
