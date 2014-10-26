@@ -1,5 +1,5 @@
 -- Copyright (C) 2010 Thilo Cestonaro
--- 
+--
 -- This project is MIT/X11 licensed.
 --
 require("net.httpclient_listener");
@@ -8,7 +8,7 @@ local st = require("util.stanza");
 local tostring = tostring;
 
 function riddim.plugins.youtube(bot)
-	local youtubelink_pattern = "http:%/%/www.youtube.com%/watch%?v=([%a%-%_%d]+)";
+	local youtubelink_pattern = "https?:%/%/www.youtube.com%/watch%?v=([%a%-%_%d]+).*";
 
 	local function bare_reply(event, reply)
 		if event.stanza.attr.type == 'groupchat' then
