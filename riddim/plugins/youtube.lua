@@ -2,6 +2,7 @@
 --
 -- This project is MIT/X11 licensed.
 --
+YTDEBUG = false
 require("net.httpclient_listener");
 local http = require("net.http");
 local st = require("util.stanza");
@@ -30,12 +31,16 @@ function riddim.plugins.youtube(bot)
 		local videoId = body:match(youtubelink_pattern);
 
 		if videoId then
-			print("VideoID: "..tostring(videoId));
+			if YTDEBUG then
+				print("VideoID: "..tostring(videoId));
+			end
 			http.request("http://gdata.youtube.com/feeds/api/videos/"..tostring(videoId).."?v=2", nil, function (data, code, request)
-				print("returned code: "..tostring(code));
-				print("-------------------------------------------------------------------------------------------");
-				print("returned data: "..tostring(data));
-				print("-------------------------------------------------------------------------------------------");
+				if YTDEBUG then
+					print("returned code: "..tostring(code));
+					print("-------------------------------------------------------------------------------------------");
+					print("returned data: "..tostring(data));
+					print("-------------------------------------------------------------------------------------------");
+				end
 				if code ~= 200 then
 					if code > 0 then
 						event:reply("Received HTTP "..code.." error (video gone?)");
