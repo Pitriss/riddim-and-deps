@@ -80,11 +80,9 @@ function riddim.plugins.slap(bot)
 	local function backfire(message)
 		local weapon = bot.config.weapons[math.random(#bot.config.weapons)]
 		local match = "/me slaps "..bot.config.nick..".*"
-		if message.body:match(match) then
+		if message.body and message.body:match(match) then
 			if message.room then
 				message.room:send_message("/me dodges and slaps "..message.nick.." around a bit with "..weapon)
-			else
-				message:reply("/me dodges and slaps "..message.nick.." around a bit with "..weapon);
 			end
 		end
 	end
