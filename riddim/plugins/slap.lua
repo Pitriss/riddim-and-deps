@@ -41,7 +41,7 @@ function riddim.plugins.slap(bot)
 		end
 	end
 
-	-- drop a weapon
+   -- drop a weapon
 	local function drop(command)
 		if command.param then
 		local found
@@ -68,7 +68,6 @@ function riddim.plugins.slap(bot)
 		end
 	end
 
-
 	local function arsenal(command)
 		local all_weapons = " - "
 		for i,v in ipairs(bot.config.weapons) do
@@ -78,10 +77,28 @@ function riddim.plugins.slap(bot)
 		return '/me have following weapons: \n'..all_weapons
 	end
 
+	local function backfire(message)
+		local weapon = bot.config.weapons[math.random(#bot.config.weapons)]
+		local match = "/me slaps "..bot.config.nick..".*"
+		if message.body:match(match) then
+			if message.room then
+				message.room:send_message("/me dodges and slaps "..message.nick.." around a bit with a "..weapon)
+			else
+				message:reply("/me dodges and slaps "..message.nick.." around a bit with a "..weapon);
+			end
+		end
+	end
+
+
+	bot:hook("message", backfire)
+	bot:hook("groupchat/joining", function (room)
+		room:hook("message", backfire)
+	end)
 	bot:hook('commands/slap', slap)
 	bot:hook('commands/weapon', weapon)
 	bot:hook('commands/drop', drop)
 	bot:hook('commands/arsenal', arsenal)
+
 end
 
 -- end of slap.lua
