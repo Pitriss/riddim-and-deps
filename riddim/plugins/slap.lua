@@ -12,14 +12,22 @@ function riddim.plugins.slap(bot)
 	local function slap(command)
 		local who, weapon
 		if command.param then
-		who = command.param
+			who = command.param
+			if who == bot.config.nick then
+				if command.sender.nick then
+					who = command.sender.nick
+				else
+					who = (jid.split(command.sender.jid))
+				end
+				return string.format('/me slaps %s with %s', who, "a go f**k yourself.:P")
+			end
 		else
 		-- slap the sender if they don't specify a target
-		if command.sender.nick then
-			who = command.sender.nick
-		else
-			who = (jid.split(command.sender.jid))
-		end
+			if command.sender.nick then
+				who = command.sender.nick
+			else
+				who = (jid.split(command.sender.jid))
+			end
 		end
 		weapon = bot.config.weapons[math.random(#bot.config.weapons)]
 		return string.format('/me slaps %s with %s', who, weapon)
