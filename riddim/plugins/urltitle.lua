@@ -6,6 +6,7 @@ function riddim.plugins.urltitle(bot)
 	local nstr = nil
 	local err = nil
 	local title = nil
+	local encod = nil
 
 	local entities = {
 		nbsp = " ",
@@ -218,6 +219,22 @@ function riddim.plugins.urltitle(bot)
 		return entities[string.sub(entity, 2, -2)] or entity
 	end
 
+	function ProcessTitle(title,enc)
+		title = title:gsub("\n", "")
+		if encod ~= "UTF-8" then
+			local constr = iconv.new("UTF-8//TRANSLIT", enc)
+			nstr, err = constr:iconv(title)
+			title = nstr
+		end
+		title = title:match("^%s*(.-)%s*$") -- Remove leading and trailing whitespace
+		title = title:gsub('%c','') -- Remove all controll characters
+		title = title:gsub("&%a+;", ReplaceEntity) -- Replace entities with characters
+		title = title:gsub("&not;", "¬") -- Handled separately due simple design
+		title = title:gsub('&quot;', '"') -- Handled separately due simple design
+		title = title:gsub('&#039;', "'") -- Apostrophe in numeric.
+		return title
+	end
+
 	local function handler(message)
 		local url = message.body and message.body:match("https?://%S+");
 		if url then
@@ -235,21 +252,23 @@ function riddim.plugins.urltitle(bot)
 				end
 				local title = data:match("<title[^>]*>([^<]+)");
 				if data:match('charset=(%w+[-_]%w+)') == nil then
-					return
-				end
-				local encod = string.upper(data:match('charset=(%w+[-_]%w+)'))
-				if title then
-					title = title:gsub("\n", "")
-					if encod ~= "UTF-8" then
-						local constr = iconv.new("UTF-8//TRANSLIT", encod)
-						nstr, err = constr:iconv(title)
-						title = nstr
+					if title then
+						title = title:gsub("\n", "")
+						-- Charset not specified, lets check if it is UTF-8
+						local stutf, errutf = nil
+						local coutf = iconv.new("UTF-8//TRANSLIT", "UTF-8")
+						stutf, errutf = coutf:iconv(title)
+						if title == stutf then
+							encod = "UTF-8"
+						else
+							return
+						end
 					end
-					title = title:match("^%s*(.-)%s*$") -- Remove leading and trailing whitespace
-					title = title:gsub('%c','') -- Remove all controll characters
-					title = title:gsub("&%a+;", ReplaceEntity) -- Replace entities with characters
-					title = title:gsub("&not;", "¬") -- Handled separately due simple design
-					title = title:gsub('&quot;', '"') -- Handled separately due simple design
+				else
+					encod = string.upper(data:match('charset=(%w+[-_]%w+)'))
+				end
+				if title then
+					title = ProcessTitle(title, encod)
 					if message.room then
 						message.room:send_message(title)
 					else
