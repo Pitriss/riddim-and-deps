@@ -8,12 +8,16 @@ function riddim.plugins.slap(bot)
 		bot.config.weapons = {'a large trout'}
 	end
 
+	function trim(s)
+		return (s:gsub("^%s*(.-)%s*$", "%1"))
+	end
+
 	-- slap someone
 	local function slap(command)
 		local who, weapon
 		if command.param then
-			who = command.param
-			if who == bot.config.nick then
+			who = string.lower(trim(command.param))
+			if who == string.lower(bot.config.nick) then
 				if command.sender.nick then
 					who = command.sender.nick
 				else
