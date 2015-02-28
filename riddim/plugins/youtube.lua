@@ -49,7 +49,35 @@ function riddim.plugins.youtube(bot)
 					end
 					return;
 				end
-				bare_reply(event, "Title: " .. data:match("<title>(.-)</title>"))
+				local vidlenght = data:match("<yt:duration seconds='(.-)'/>")
+				local vidlen = ""
+				if vidlenght ~= nil or vidlenght ~= "" then
+					local vidsec = tonumber(vidlenght)
+					if string.format("%.2d", vidsec/(60*60)) ~= "00" then
+						vidlen = string.format("%.2d:%.2d:%.2d", vidsec/(60*60), vidsec/60%60, vidsec%60)
+					else
+						vidlen = string.format("%.2d:%.2d", vidsec/60%60, vidsec%60)
+					end
+				end
+				local vidviews = data:match("viewCount='(.-)'")
+				local info = ""
+				if vidviews ~= nil or vidviews ~= "" then
+					info = info.."Viewed "..vidviews.."×, "
+				end
+				local vidlikes = data:match("numLikes='(.-)'/>")
+				local viddislikes = data:match("<yt:rating numDislikes='(.-)'")
+				local totallikes = "Likes: "..vidlikes..", Dislikes: "..viddislikes
+				info = info..totallikes..", "
+
+				local vidrat = data:match("<gd:rating average='(.-)'")
+				local vidrat_r = tonumber(string.format("%.2f", vidrat))
+
+				info = info.."AVG rating: "..vidrat_r.."/5"
+
+				local vidtitle = "Title: " .. data:match("<title>(.-)</title>")
+				if info ~= "" then info = "\n["..info.."]" end
+				local breply = vidtitle.." ("..vidlen..") "..info
+				bare_reply(event, breply)
 			end);
 		end
 	end
