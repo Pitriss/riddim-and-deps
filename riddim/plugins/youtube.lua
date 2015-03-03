@@ -282,20 +282,22 @@ function riddim.plugins.youtube(bot)
 						vidlen = string.format("%.2d:%.2d", vidsec/60%60, vidsec%60)
 					end
 				end
-				local vidviews = data:match("viewCount='(.-)'")
+				local vidviews = data:match("viewCount='(.-)'") or "N/A"
 				local info = ""
-				if vidviews ~= nil or vidviews ~= "" then
-					info = info.."Viewed "..vidviews.."×, "
-				end
-				local vidlikes = data:match("numLikes='(.-)'/>")
-				local viddislikes = data:match("<yt:rating numDislikes='(.-)'")
+				info = info.."Viewed "..vidviews.."×, "
+				local vidlikes = data:match("numLikes='(.-)'/>") or "N/A"
+				local viddislikes = data:match("<yt:rating numDislikes='(.-)'") or "N/A"
 				local totallikes = "Likes: "..vidlikes..", Dislikes: "..viddislikes
 				info = info..totallikes..", "
 
-				local vidrat = data:match("<gd:rating average='(.-)'")
-				local vidrat_r = tonumber(string.format("%.2f", vidrat))
-
-				info = info.."AVG rating: "..vidrat_r.."/5"
+				local vidrat = data:match("<gd:rating average='(.-)'") or "N/A"
+				local vidrat_r = 0
+				if vidrat == "N/A" then
+					info = info.."AVG rating: N/A"
+				else
+					vidrat_r = tonumber(string.format("%.2f", vidrat))
+					info = info.."AVG rating: "..vidrat_r.."/5"
+				end
 
 				local vidtitle = "Title: " .. data:match("<title>(.-)</title>")
 				vidtitle = HumanReadable(vidtitle)
