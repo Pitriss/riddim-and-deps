@@ -213,7 +213,16 @@ function riddim.plugins.urltitle(bot)
 		lsaquo = "‹",
 		rsaquo = "›",
 		euro = "€",
+		amp = "&",
 	}
+
+	function check_youtube(url)
+		if url:match("https://www.youtube.com/") == nil and url:match("http://www.youtube.com/") == nil then
+			return false
+		else
+			return true
+		end
+	end
 
 	function ReplaceEntity(entity)
 		return entities[string.sub(entity, 2, -2)] or entity
@@ -240,7 +249,7 @@ function riddim.plugins.urltitle(bot)
 
 	local function handler(message)
 		local url = message.body and message.body:match("https?://%S+");
-		if url then
+		if url and check_youtube(url) == false then
 			http.request(url, nil, function (data, code, headers)
 				if code ~= 200 then
 					if code == 302 or code == 301 then
