@@ -13,12 +13,15 @@ function riddim.plugins.weather(bot)
 		print ("Apikey not set. Please set your http://www.wunderground.com apikey in bot config. (weather_apikey = \"YourApikeyHere\")")
 	else
 		require "net.httpclient_listener";
-		local http = require "net.http";
--- 		require "LuaXml"
+		local http = require ("net.http");
 		local json = require ("dkjson")
 
 		function trim(s)
-			return (s:gsub("^%s*(.-)%s*$", "%1"))
+			if  s~= nil and s ~= "" then
+				return (s:gsub("^%s*(.-)%s*$", "%1"))
+			else
+				return ""
+			end
 		end
 
 		function url_encode(str)
@@ -32,7 +35,7 @@ function riddim.plugins.weather(bot)
 		end
 
 		bot:hook("commands/weather", function (command)
-			local city = trim(command.param);
+			local city = trim(command.param) or "";
 
 			if city then
 				ecity = url_encode(city)
