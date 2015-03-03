@@ -213,7 +213,6 @@ function riddim.plugins.urltitle(bot)
 		lsaquo = "‹",
 		rsaquo = "›",
 		euro = "€",
-		amp = "&",
 	}
 
 	function check_youtube(url)
