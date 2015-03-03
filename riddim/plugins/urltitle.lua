@@ -221,8 +221,11 @@ function riddim.plugins.urltitle(bot)
 
 	function ProcessTitle(title,enc)
 		title = title:gsub("\n", "")
-		if encod ~= "UTF-8" then
+		if enc ~= "UTF-8" then
 			local constr = iconv.new("UTF-8//TRANSLIT", enc)
+			if constr == nil then
+				print("ERROR: enc:"..tostring(enc)..", title: "..tostring(title))
+			end
 			nstr, err = constr:iconv(title)
 			title = nstr
 		end
