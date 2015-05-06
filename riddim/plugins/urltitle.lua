@@ -248,7 +248,7 @@ function riddim.plugins.urltitle(bot)
 
 	local function handler(message)
 		local url = message.body and message.body:match("https?://%S+");
-		if url and check_youtube(url) == false then
+		if url then
 			http.request(url, nil, function (data, code, headers)
 				if code ~= 200 then
 					if code == 302 or code == 301 then
@@ -270,6 +270,8 @@ function riddim.plugins.urltitle(bot)
 						local coutf = iconv.new("UTF-8//TRANSLIT", "UTF-8")
 						stutf, errutf = coutf:iconv(title)
 						if title == stutf then
+							encod = "UTF-8"
+						elseif check_youtube(url) == false then
 							encod = "UTF-8"
 						else
 							return
