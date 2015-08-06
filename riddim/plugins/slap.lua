@@ -99,6 +99,24 @@ function riddim.plugins.slap(bot)
 		end
 	end
 
+	local function spal(command)
+		local who, whotest
+		if command.param and trim(command.param) ~= "" then
+			who = trim(command.param)
+			whotest = string.lower(trim(command.param))
+			if whotest == string.lower(bot.config.nick) then
+				if command.sender.nick then
+					who = command.sender.nick
+				else
+					who = (jid.split(command.sender.jid))
+				end
+				return string.format('/me sets %s on fire. Next time don\'t f**k with me.', who)
+			end
+		else
+			return 'Chytej... Tu máš sirky a běž si hrát do stohu, cype.'
+		end
+		return string.format('Nech %s být. Tu máš sirky a běž si hrát do stohu, cype.', who)
+	end
 
 	bot:hook("message", backfire)
 	bot:hook("groupchat/joining", function (room)
@@ -108,7 +126,7 @@ function riddim.plugins.slap(bot)
 	bot:hook('commands/weapon', weapon)
 	bot:hook('commands/drop', drop)
 	bot:hook('commands/arsenal', arsenal)
-
+	bot:hook('commands/spal', spal)
 end
 
 -- end of slap.lua
